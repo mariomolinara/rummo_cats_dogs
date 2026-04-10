@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐱🐶 Cat vs Dog Classifier</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            color: #fff;
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .subtitle {
+            text-align: center;
+            color: rgba(255,255,255,0.85);
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        /* ── Upload Card ── */
+        .upload-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            margin-bottom: 30px;
+        }
+        .upload-card h2 {
+            margin-bottom: 20px;
+            color: #4a4a4a;
+            font-size: 1.3em;
+        }
+        .upload-form {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .upload-form input[type="file"] {
+            flex: 1;
+            min-width: 250px;
+            padding: 12px;
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+        .upload-form input[type="file"]:hover {
+            border-color: #667eea;
+        }
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: #fff;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        .btn-danger {
+            background: #e74c3c;
+            color: #fff;
+        }
+        .btn-danger:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+        }
+
+        /* ── Stats ── */
+        .stats-bar {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .stat-box {
+            background: #fff;
+            border-radius: 12px;
+            padding: 15px 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            text-align: center;
+            flex: 1;
+            min-width: 120px;
+        }
+        .stat-box .number {
+            font-size: 2em;
+            font-weight: 700;
+        }
+        .stat-box .label {
+            font-size: 0.85em;
+            color: #888;
+            margin-top: 4px;
+        }
+        .stat-total .number { color: #667eea; }
+        .stat-cat .number { color: #e67e22; }
+        .stat-dog .number { color: #3498db; }
+
+        /* ── Results Table ── */
+        .results-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+        }
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .results-header h2 {
+            color: #4a4a4a;
+            font-size: 1.3em;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        thead th {
+            background: #f8f9fa;
+            padding: 12px 10px;
+            text-align: left;
+            font-size: 0.85em;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #eee;
+        }
+        tbody td {
+            padding: 12px 10px;
+            border-bottom: 1px solid #f0f0f0;
+            vertical-align: middle;
+            font-size: 0.95em;
+        }
+        tbody tr:hover {
+            background: #f8f9fa;
+        }
+        .thumbnail {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .badge {
+            display: inline-block;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+        .badge-cat {
+            background: #fef3e2;
+            color: #e67e22;
+        }
+        .badge-dog {
+            background: #e8f4fd;
+            color: #3498db;
+        }
+        .confidence-bar {
+            width: 100px;
+            height: 8px;
+            background: #eee;
+            border-radius: 4px;
+            overflow: hidden;
+            display: inline-block;
+            vertical-align: middle;
+            margin-left: 8px;
+        }
+        .confidence-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s;
+        }
+        .conf-high { background: #2ecc71; }
+        .conf-medium { background: #f39c12; }
+        .conf-low { background: #e74c3c; }
+        .text-muted {
+            color: #aaa;
+            font-size: 0.85em;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #aaa;
+        }
+        .empty-state .icon {
+            font-size: 4em;
+            margin-bottom: 15px;
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 768px) {
+            .upload-form {
+                flex-direction: column;
+            }
+            table {
+                font-size: 0.8em;
+            }
+            .thumbnail {
+                width: 45px;
+                height: 45px;
+            }
+            .confidence-bar {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🐱 Cat vs Dog Classifier 🐶</h1>
+        <p class="subtitle">Classificatore basato su AlexNet — Carica un'immagine per scoprire se è un gatto o un cane</p>
+
+        <!-- Upload Form -->
+        <div class="upload-card">
+            <h2>📤 Carica un'immagine</h2>
+            <form class="upload-form" action="/predict" method="POST" enctype="multipart/form-data">
+                <input type="file" name="file" accept="image/*" required>
+                <button type="submit" class="btn btn-primary">🔍 Classifica</button>
+            </form>
+        </div>
+
+        <!-- Stats -->
+        {% if total > 0 %}
+        <div class="stats-bar">
+            <div class="stat-box stat-total">
+                <div class="number">{{ total }}</div>
+                <div class="label">Totale Classificazioni</div>
+            </div>
+            <div class="stat-box stat-cat">
+                <div class="number">{{ cats }}</div>
+                <div class="label">🐱 Gatti</div>
+            </div>
+            <div class="stat-box stat-dog">
+                <div class="number">{{ dogs }}</div>
+                <div class="label">🐶 Cani</div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Results Table -->
+        <div class="results-card">
+            <div class="results-header">
+                <h2>📊 Storico Classificazioni</h2>
+                {% if total > 0 %}
+                <form action="/clear" method="POST" onsubmit="return confirm('Sei sicuro di voler cancellare tutto lo storico?');">
+                    <button type="submit" class="btn btn-danger">🗑️ Cancella Storico</button>
+                </form>
+                {% endif %}
+            </div>
+
+            {% if history|length > 0 %}
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Anteprima</th>
+                            <th>Nome File</th>
+                            <th>Data/Ora</th>
+                            <th>Predizione</th>
+                            <th>Confidenza</th>
+                            <th>Prob. Raw (Dog)</th>
+                            <th>Dim. Originali</th>
+                            <th>Tempo Inferenza</th>
+                            <th>Device</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in history|reverse %}
+                        <tr>
+                            <td><strong>{{ item.id }}</strong></td>
+                            <td>
+                                <img class="thumbnail"
+                                     src="{{ url_for('static', filename='uploads/' + item.saved_as) }}"
+                                     alt="{{ item.filename }}">
+                            </td>
+                            <td>
+                                {{ item.filename }}
+                            </td>
+                            <td class="text-muted">{{ item.timestamp }}</td>
+                            <td>
+                                {% if item.predicted_class == 'Cat' %}
+                                    <span class="badge badge-cat">🐱 Cat</span>
+                                {% else %}
+                                    <span class="badge badge-dog">🐶 Dog</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <strong>{{ item.confidence_pct }}%</strong>
+                                <div class="confidence-bar">
+                                    <div class="confidence-fill
+                                        {% if item.confidence_pct >= 90 %}conf-high
+                                        {% elif item.confidence_pct >= 70 %}conf-medium
+                                        {% else %}conf-low{% endif %}"
+                                        style="width: {{ item.confidence_pct }}%;">
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <code>{{ item.raw_probability }}</code>
+                            </td>
+                            <td class="text-muted">{{ item.original_size }}</td>
+                            <td>
+                                <strong>{{ item.inference_ms }}</strong> ms
+                            </td>
+                            <td class="text-muted">{{ item.device|default('N/A') }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <div class="icon">📷</div>
+                <p>Nessuna immagine classificata ancora.<br>Carica un'immagine per iniziare!</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
+

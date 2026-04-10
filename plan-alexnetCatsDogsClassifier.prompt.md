@@ -61,7 +61,7 @@ TensorFlow potrebbe non supportare Python 3.13. Prima di tutto verificare se `pi
 
 | Domanda | Decisione |
 |---|---|
-| Python 3.13 e TensorFlow | Lo Step 0 prevede un piano di fallback con downgrade a Python 3.11 |
+| Python 3.13 e TensorFlow | ✅ Lo Step 0 verificato: TF 2.21.0 funziona su Python 3.13.7 |
 | EarlyStopping: cosa monitorare | Solo `val_loss` con `patience=30` |
 | Persistenza risultati web app | File JSON (`classification_history.json`), ricaricato al riavvio del server |
 
