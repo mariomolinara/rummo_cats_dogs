@@ -4,12 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="4d77a987-31c9-4ca2-b481-7629b93058a2" name="Changes" comment="Add Flask web app for dog and cat classification with AlexNet">
-      <change afterPath="$PROJECT_DIR$/app_gpu.sh" afterDir="false" />
+    <list default="true" id="4d77a987-31c9-4ca2-b481-7629b93058a2" name="Changes" comment="Enhance Flask web app with GPU support and device selection for image classification">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/train.py" beforeDir="false" afterPath="$PROJECT_DIR$/train.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -149,7 +147,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1775829546787</updated>
-      <workItem from="1775829547836" duration="14903000" />
+      <workItem from="1775829547836" duration="17752000" />
     </task>
     <task id="LOCAL-00001" summary="Initialize project structure for dog and cat classification with AlexNet">
       <option name="closed" value="true" />
@@ -167,7 +165,15 @@
       <option name="project" value="LOCAL" />
       <updated>1775856738825</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Enhance Flask web app with GPU support and device selection for image classification">
+      <option name="closed" value="true" />
+      <created>1775868594711</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1775868594711</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -187,7 +193,8 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Initialize project structure for dog and cat classification with AlexNet" />
     <MESSAGE value="Add Flask web app for dog and cat classification with AlexNet" />
-    <option name="LAST_COMMIT_MESSAGE" value="Add Flask web app for dog and cat classification with AlexNet" />
+    <MESSAGE value="Enhance Flask web app with GPU support and device selection for image classification" />
+    <option name="LAST_COMMIT_MESSAGE" value="Enhance Flask web app with GPU support and device selection for image classification" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/rummo_cats_dogs$app.coverage" NAME="app Coverage Results" MODIFIED="1775867137652" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
