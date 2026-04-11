@@ -34,7 +34,7 @@ CLASS_NAMES = ["Cat", "Dog"]  # 0=Cat, 1=Dog (ordine alfabetico)
 def setup_gpu():
     """
     Rileva GPU disponibili, configura memory growth e restituisce
-    una stringa descrittiva del device in uso.
+    una stringa descrittiva del device in uso e la lista dei device disponibili.
     """
     print("-" * 50)
     print("  RILEVAMENTO HARDWARE")
@@ -59,6 +59,7 @@ def setup_gpu():
 
     # Rileva GPU visibili da TensorFlow
     gpus = tf.config.list_physical_devices("GPU")
+    available_devices = ["CPU"]
     if gpus:
         print(f"  ✅ GPU TensorFlow: {len(gpus)} rilevata/e")
         for gpu in gpus:
@@ -66,18 +67,19 @@ def setup_gpu():
                 tf.config.experimental.set_memory_growth(gpu, True)
             except RuntimeError:
                 pass
-        device_info = f"GPU ({gpus[0].name})"
+        available_devices.append("GPU")
+        default_device = "GPU"
     else:
-        print("  ⚠️  GPU non disponibile per TF — inferenza su CPU")
-        device_info = "CPU"
+        print("  ⚠️  GPU non disponibile per TF — solo CPU")
+        default_device = "CPU"
 
-    print(f"  Device: {device_info}")
+    print(f"  Device disponibili: {available_devices}")
     print("-" * 50)
-    return device_info
+    return default_device, available_devices, gpu_hw_name
 
 
 # ─── Setup GPU all'avvio ───────────────────────────────────────────────────────
-device_info = setup_gpu()
+default_device, available_devices, gpu_hw_name = setup_gpu()
 
 # ─── Flask App ─────────────────────────────────────────────────────────────────
 app = Flask(__name__)
@@ -121,9 +123,10 @@ def save_history(history):
         json.dump(history, f, ensure_ascii=False, indent=2)
 
 
-def classify_image(filepath):
+def classify_image(filepath, use_device="CPU"):
     """
     Classifica un'immagine e restituisce un dizionario con tutti i dettagli.
+    use_device: "CPU" o "GPU" — forza l'inferenza sul device scelto.
     """
     # Apri immagine per ottenere dimensioni originali
     with Image.open(filepath) as pil_img:
@@ -138,9 +141,18 @@ def classify_image(filepath):
     img_array = np.array(pil_img_resized, dtype=np.float32)
     img_array = np.expand_dims(img_array, axis=0)
 
-    # Inferenza con misurazione tempo
+    # Scegli il device per l'inferenza
+    if use_device == "GPU" and "GPU" in available_devices:
+        device_str = "/GPU:0"
+        device_label = f"GPU ({gpu_hw_name})"
+    else:
+        device_str = "/CPU:0"
+        device_label = "CPU"
+
+    # Inferenza con misurazione tempo sul device scelto
     start_time = time.perf_counter()
-    prediction = model.predict(img_array, verbose=0)
+    with tf.device(device_str):
+        prediction = model.predict(img_array, verbose=0)
     elapsed_ms = (time.perf_counter() - start_time) * 1000
 
     raw_prob = float(prediction[0][0])  # probabilità classe Dog
@@ -153,7 +165,7 @@ def classify_image(filepath):
         "raw_probability": round(raw_prob, 6),
         "original_size": original_size,
         "inference_ms": round(elapsed_ms, 2),
-        "device": device_info,
+        "device": device_label,
     }
 
 
@@ -171,6 +183,9 @@ def index():
         total=total,
         cats=cats,
         dogs=dogs,
+        available_devices=available_devices,
+        default_device=default_device,
+        gpu_hw_name=gpu_hw_name,
     )
 
 
@@ -189,8 +204,11 @@ def predict():
     save_path = os.path.join(UPLOAD_FOLDER, unique_name)
     file.save(save_path)
 
-    # Classifica
-    result = classify_image(save_path)
+    # Classifica con il device scelto dall'utente
+    chosen_device = request.form.get("device", default_device)
+    if chosen_device not in available_devices:
+        chosen_device = "CPU"
+    result = classify_image(save_path, use_device=chosen_device)
 
     # Crea record
     history = load_history()

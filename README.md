@@ -4,10 +4,58 @@ Classificatore di immagini **Cani vs Gatti** basato sull'architettura **AlexNet*
 
 ---
 
+## 🎓 Contesto didattico
+
+Questo progetto è stato preparato come materiale pratico per un **breve corso introduttivo al Deep Learning e all'Intelligenza Artificiale** tenuto presso il **Liceo Scientifico "G. Rummo" di Benevento**.
+
+Gli incontri si sono svolti in due giornate:
+- 📅 **11 aprile 2026**
+- 📅 **18 aprile 2026**
+
+Il corso è stato tenuto dal **Prof. Mario Molinara** dell'**Università degli Studi di Cassino e del Lazio Meridionale**.
+
+---
+
+## 🧠 La rete AlexNet
+
+La rete utilizzata in questo progetto è **AlexNet**, una delle **primissime reti neurali convoluzionali di tipo Deep** nella storia dell'informatica. Proposta da Alex Krizhevsky, Ilya Sutskever e Geoffrey Hinton nel 2012, AlexNet ha vinto la competizione **ImageNet Large Scale Visual Recognition Challenge (ILSVRC)** con un margine enorme rispetto ai metodi tradizionali, segnando l'inizio dell'era moderna del Deep Learning.
+
+Le caratteristiche principali di AlexNet sono:
+- **5 livelli convoluzionali** con filtri di dimensioni decrescenti (11×11, 5×5, 3×3)
+- **3 livelli fully-connected** (densi) per la classificazione finale
+- Uso di **ReLU** come funzione di attivazione (al posto della sigmoide, molto più lenta)
+- **Dropout** per la regolarizzazione e prevenzione dell'overfitting
+- **Batch Normalization** per stabilizzare il training
+
+In questo progetto AlexNet è adattata per la **classificazione binaria** (Gatto vs Cane) con un'uscita sigmoide.
+
+---
+
+## 📦 Download del dataset
+
+Il dataset va scaricato manualmente da Kaggle:
+
+👉 **https://www.kaggle.com/datasets/bhavikjikadara/dog-and-cat-classification-dataset/data**
+
+Dopo il download, crea la seguente struttura di cartelle nella directory del progetto:
+
+```
+rummo_cats_dogs/
+└── PetImages/
+    ├── Cat/       ← inserisci qui tutte le immagini di gatti
+    └── Dog/       ← inserisci qui tutte le immagini di cani
+```
+
+Le immagini contenute in queste cartelle verranno automaticamente suddivise dallo script `train.py` in **training (70%)**, **validation (20%)** e **test (10%)**.
+
+> ⚠️ Non serve creare sottocartelle separate per train/val/test: ci pensa lo script!
+
+---
+
 ## 📋 Requisiti
 
 - **Python 3.10–3.13** (verificato con Python 3.13.7 + TensorFlow 2.21.0)
-- Il dataset **PetImages** con le sottocartelle `Cat/` e `Dog/` già presente nella cartella del progetto
+- Il dataset **PetImages** con le sottocartelle `Cat/` e `Dog/` (vedi sezione precedente)
 
 ---
 
@@ -84,10 +132,18 @@ Cosa fa `train.py`:
 
 ## 🌐 Avvio della Web App
 
-Dopo il training, avvia la web app:
+Dopo il training, avvia la web app.
+
+### Opzione A — Web App su CPU (Windows nativo)
 
 ```powershell
 python app.py
+```
+
+### Opzione B — Web App su GPU con WSL2 (inferenza più veloce)
+
+```powershell
+wsl -d Ubuntu -- bash /mnt/c/Users/mmoli/Desktop/AIDALab/Rummo_11042026/rummo_cats_dogs/app_gpu.sh
 ```
 
 Poi apri il browser e vai su:
@@ -95,8 +151,10 @@ Poi apri il browser e vai su:
 👉 **http://localhost:5000**
 
 Dalla pagina puoi:
+- **Scegliere il device** (CPU o GPU) dal menu a tendina prima di classificare
 - **Caricare un'immagine** di un gatto o un cane
 - **Vedere la classificazione** con dettagli tecnici (confidenza, tempo di inferenza, ecc.)
+- **Cliccare sull'anteprima** per aprire una dialog con immagine ingrandita e tutti i dettagli
 - **Consultare lo storico** di tutte le classificazioni in una tabella
 - **Cancellare lo storico** con un pulsante
 
@@ -117,6 +175,7 @@ rummo_cats_dogs/
 ├── app.py                 # Web app Flask
 ├── setup_wsl.sh           # Setup ambiente WSL2 con GPU CUDA
 ├── train_gpu.sh           # Lancia training su WSL2 con GPU
+├── app_gpu.sh             # Lancia web app su WSL2 con GPU
 ├── requirements.txt       # Dipendenze Python
 ├── alexnet_cats_dogs.keras # Modello (generato dopo il training)
 ├── training_history.png   # Grafico loss (generato dopo il training)

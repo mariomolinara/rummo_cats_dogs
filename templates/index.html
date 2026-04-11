@@ -56,7 +56,7 @@
         }
         .upload-form input[type="file"] {
             flex: 1;
-            min-width: 250px;
+            min-width: 200px;
             padding: 12px;
             border: 2px dashed #ccc;
             border-radius: 8px;
@@ -66,6 +66,28 @@
         }
         .upload-form input[type="file"]:hover {
             border-color: #667eea;
+        }
+        .device-select {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 8px 14px;
+            font-size: 0.95em;
+        }
+        .device-select label {
+            font-weight: 600;
+            color: #555;
+            white-space: nowrap;
+        }
+        .device-select select {
+            padding: 6px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 0.95em;
+            background: #fff;
+            cursor: pointer;
         }
         .btn {
             padding: 12px 30px;
@@ -172,6 +194,12 @@
             object-fit: cover;
             border-radius: 8px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .thumbnail:hover {
+            transform: scale(1.15);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.25);
         }
         .badge {
             display: inline-block;
@@ -220,6 +248,115 @@
             margin-bottom: 15px;
         }
 
+        /* ── Modal Dialog ── */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.75);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal-content {
+            background: #fff;
+            border-radius: 20px;
+            max-width: 800px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            animation: modalIn 0.3s ease;
+        }
+        @keyframes modalIn {
+            from { transform: scale(0.85); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 30px;
+            border-bottom: 1px solid #eee;
+        }
+        .modal-header h3 {
+            font-size: 1.4em;
+            color: #333;
+        }
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 2em;
+            cursor: pointer;
+            color: #999;
+            line-height: 1;
+            padding: 0 5px;
+            transition: color 0.2s;
+        }
+        .modal-close:hover {
+            color: #e74c3c;
+        }
+        .modal-body {
+            padding: 30px;
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+        .modal-image-wrap {
+            flex: 1;
+            min-width: 250px;
+            text-align: center;
+        }
+        .modal-image-wrap img {
+            max-width: 100%;
+            max-height: 400px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+        .modal-details {
+            flex: 1;
+            min-width: 250px;
+        }
+        .modal-details .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 1.15em;
+        }
+        .modal-details .detail-row:last-child {
+            border-bottom: none;
+        }
+        .detail-label {
+            color: #888;
+            font-weight: 500;
+        }
+        .detail-value {
+            font-weight: 700;
+            color: #333;
+        }
+        .modal-badge {
+            display: inline-block;
+            padding: 8px 24px;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+        .modal-badge-cat {
+            background: #fef3e2;
+            color: #e67e22;
+        }
+        .modal-badge-dog {
+            background: #e8f4fd;
+            color: #3498db;
+        }
+
         /* ── Responsive ── */
         @media (max-width: 768px) {
             .upload-form {
@@ -235,6 +372,12 @@
             .confidence-bar {
                 display: none;
             }
+            .modal-body {
+                flex-direction: column;
+            }
+            .modal-details .detail-row {
+                font-size: 1em;
+            }
         }
     </style>
 </head>
@@ -248,6 +391,16 @@
             <h2>📤 Carica un'immagine</h2>
             <form class="upload-form" action="/predict" method="POST" enctype="multipart/form-data">
                 <input type="file" name="file" accept="image/*" required>
+                <div class="device-select">
+                    <label for="device">⚙️ Device:</label>
+                    <select name="device" id="device">
+                        {% for dev in available_devices %}
+                        <option value="{{ dev }}" {% if dev == default_device %}selected{% endif %}>
+                            {{ dev }}{% if dev == 'GPU' and gpu_hw_name != 'N/A' %} — {{ gpu_hw_name }}{% endif %}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
                 <button type="submit" class="btn btn-primary">🔍 Classifica</button>
             </form>
         </div>
@@ -305,7 +458,20 @@
                             <td>
                                 <img class="thumbnail"
                                      src="{{ url_for('static', filename='uploads/' + item.saved_as) }}"
-                                     alt="{{ item.filename }}">
+                                     alt="{{ item.filename }}"
+                                     onclick="openModal(
+                                         '{{ url_for('static', filename='uploads/' + item.saved_as) }}',
+                                         '{{ item.filename }}',
+                                         '{{ item.predicted_class }}',
+                                         '{{ item.confidence_pct }}',
+                                         '{{ item.raw_probability }}',
+                                         '{{ item.original_size }}',
+                                         '{{ item.inference_ms }}',
+                                         '{{ item.device|default('N/A') }}',
+                                         '{{ item.timestamp }}',
+                                         '{{ item.id }}'
+                                     )"
+                                     title="Clicca per ingrandire">
                             </td>
                             <td>
                                 {{ item.filename }}
@@ -350,6 +516,98 @@
             {% endif %}
         </div>
     </div>
+
+    <!-- ── Modal per dettaglio immagine ── -->
+    <div class="modal-overlay" id="imageModal" onclick="closeModalOutside(event)">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Dettaglio Classificazione</h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-image-wrap">
+                    <div id="modalBadge"></div>
+                    <img id="modalImage" src="" alt="Immagine classificata">
+                </div>
+                <div class="modal-details">
+                    <div class="detail-row">
+                        <span class="detail-label">📁 File</span>
+                        <span class="detail-value" id="modalFilename"></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">🏷️ Predizione</span>
+                        <span class="detail-value" id="modalPrediction"></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">📊 Confidenza</span>
+                        <span class="detail-value" id="modalConfidence"></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">🔢 Probabilità Raw (Dog)</span>
+                        <span class="detail-value" id="modalRawProb"></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">📐 Dimensioni Originali</span>
+                        <span class="detail-value" id="modalSize"></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">⏱️ Tempo Inferenza</span>
+                        <span class="detail-value" id="modalTime"></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">💻 Device</span>
+                        <span class="detail-value" id="modalDevice"></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">🕐 Data/Ora</span>
+                        <span class="detail-value" id="modalTimestamp"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openModal(imgSrc, filename, prediction, confidence, rawProb, size, timeMs, device, timestamp, id) {
+            document.getElementById('modalImage').src = imgSrc;
+            document.getElementById('modalFilename').textContent = filename;
+            document.getElementById('modalTitle').textContent = 'Classificazione #' + id;
+
+            var emoji = prediction === 'Cat' ? '🐱' : '🐶';
+            document.getElementById('modalPrediction').textContent = emoji + ' ' + prediction;
+
+            document.getElementById('modalConfidence').textContent = confidence + '%';
+            document.getElementById('modalRawProb').textContent = rawProb;
+            document.getElementById('modalSize').textContent = size;
+            document.getElementById('modalTime').textContent = timeMs + ' ms';
+            document.getElementById('modalDevice').textContent = device;
+            document.getElementById('modalTimestamp').textContent = timestamp;
+
+            // Badge grande
+            var badgeClass = prediction === 'Cat' ? 'modal-badge-cat' : 'modal-badge-dog';
+            document.getElementById('modalBadge').innerHTML =
+                '<span class="modal-badge ' + badgeClass + '">' + emoji + ' ' + prediction + '</span>';
+
+            document.getElementById('imageModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('imageModal').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function closeModalOutside(event) {
+            if (event.target === document.getElementById('imageModal')) {
+                closeModal();
+            }
+        }
+
+        // Chiudi con ESC
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeModal();
+        });
+    </script>
 </body>
 </html>
 
