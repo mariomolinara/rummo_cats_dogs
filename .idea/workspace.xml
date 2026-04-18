@@ -4,8 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="4d77a987-31c9-4ca2-b481-7629b93058a2" name="Changes" comment="Update README to include dataset download instructions and project structure">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="4d77a987-31c9-4ca2-b481-7629b93058a2" name="Changes" comment="Update README to enhance installation instructions and clarify project setup">
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -161,7 +160,7 @@
       <updated>1775829546787</updated>
       <workItem from="1775829547836" duration="24558000" />
       <workItem from="1775906379464" duration="8229000" />
-      <workItem from="1776485955790" duration="1000000" />
+      <workItem from="1776485955790" duration="2817000" />
     </task>
     <task id="LOCAL-00001" summary="Initialize project structure for dog and cat classification with AlexNet">
       <option name="closed" value="true" />
@@ -203,7 +202,15 @@
       <option name="project" value="LOCAL" />
       <updated>1775932819162</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="Update README to enhance installation instructions and clarify project setup">
+      <option name="closed" value="true" />
+      <created>1776487646891</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1776487646891</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -226,7 +233,8 @@
     <MESSAGE value="Enhance Flask web app with GPU support and device selection for image classification" />
     <MESSAGE value="Update README and training configuration for AlexNet project" />
     <MESSAGE value="Update README to include dataset download instructions and project structure" />
-    <option name="LAST_COMMIT_MESSAGE" value="Update README to include dataset download instructions and project structure" />
+    <MESSAGE value="Update README to enhance installation instructions and clarify project setup" />
+    <option name="LAST_COMMIT_MESSAGE" value="Update README to enhance installation instructions and clarify project setup" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/rummo_cats_dogs$app.coverage" NAME="app Coverage Results" MODIFIED="1775867137652" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />

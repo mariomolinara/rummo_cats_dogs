@@ -336,9 +336,170 @@ Se sei arrivato qui senza errori, il progetto è pronto. Ora puoi:
 
 ---
 
+## 🎮 (Opzionale) Usare la GPU con WSL2
+
+> ⚡ Questa sezione è **opzionale** e serve solo se hai un PC Windows con una **GPU NVIDIA** (es. GTX 1060 o superiore, RTX 2060/3060/4060, ecc.). Se non hai una GPU NVIDIA, o se sei su Mac/Linux, salta pure questa sezione e usa la CPU.
+
+### Cos'è WSL2 e perché serve?
+
+**WSL2** (Windows Subsystem for Linux 2) è una funzionalità di Windows 10/11 che permette di eseguire Linux *dentro* Windows, senza installare un secondo sistema operativo. È come avere un "mini-Linux" dentro il tuo PC.
+
+**Perché serve?** TensorFlow (la libreria per il deep learning) nelle versioni recenti (≥2.11) **non supporta più la GPU su Windows nativo**. Per usare la GPU devi passare per Linux, e WSL2 è il modo più semplice per farlo su Windows.
+
+**Quanto è più veloce la GPU?** Tanto! Ecco un confronto reale su questo progetto:
+
+| | CPU (i9-14900HX) | GPU (RTX 4080) | Speedup |
+|---|---|---|---|
+| Tempo per epoca di training | ~260 secondi | ~45 secondi | **~6× più veloce** |
+| Training 30 epoche | ~2 ore 10 min | ~22 minuti | **~6× più veloce** |
+| Inferenza (1 immagine) | ~50-200 ms | ~5-20 ms | **~10× più veloce** |
+
+### Passo W1 — Verifica di avere i driver NVIDIA aggiornati
+
+1. Vai su 👉 https://www.nvidia.com/Download/index.aspx
+2. Seleziona la tua GPU e scarica i driver più recenti per **Windows**
+3. Installa i driver e **riavvia il PC**
+
+> 💡 Per verificare che i driver funzionino, apri PowerShell e scrivi:
+> ```powershell
+> nvidia-smi
+> ```
+> Dovresti vedere una tabella con il nome della tua GPU e la versione del driver. Se vedi un errore, i driver non sono installati correttamente.
+
+### Passo W2 — Installa WSL2
+
+Apri **PowerShell come amministratore** (cerca "PowerShell" nel menu Start, poi clic destro → "Esegui come amministratore") e scrivi:
+
+```powershell
+wsl --install
+```
+
+Questo comando:
+- Abilita WSL2
+- Scarica e installa Ubuntu (la distribuzione Linux più popolare)
+- Potrebbe chiederti di **riavviare il PC**
+
+Dopo il riavvio, si aprirà una finestra di Ubuntu che ti chiede di creare un **nome utente e password per Linux**. Scegli qualcosa di semplice che ricordi (es. il tuo nome come utente e una password corta).
+
+> ⚠️ Quando digiti la password nel terminale Linux, **non vedrai niente apparire sullo schermo** (nemmeno asterischi). È normale! Scrivi la password e premi Invio.
+
+### Passo W3 — Verifica che WSL2 funzioni
+
+In PowerShell, scrivi:
+
+```powershell
+wsl --list -v
+```
+
+Dovresti vedere qualcosa come:
+```
+  NAME      STATE           VERSION
+* Ubuntu    Running         2
+```
+
+La cosa importante è che la colonna **VERSION** sia **2** (non 1). Se è 1, converti con:
+```powershell
+wsl --set-version Ubuntu 2
+```
+
+### Passo W4 — Verifica che la GPU sia visibile da WSL2
+
+Apri WSL2 scrivendo in PowerShell:
+
+```powershell
+wsl
+```
+
+Si aprirà il terminale Linux. Scrivi:
+
+```bash
+nvidia-smi
+```
+
+Dovresti vedere la stessa tabella della GPU che vedevi su Windows. Se funziona, la GPU è accessibile da Linux! Scrivi `exit` per tornare a PowerShell.
+
+### Passo W5 — Setup automatico dell'ambiente WSL2
+
+Il progetto include uno script che configura tutto automaticamente dentro WSL2 (Python, TensorFlow con CUDA, ecc.). Da **PowerShell** (non da WSL), scrivi:
+
+```powershell
+wsl -d Ubuntu -- bash /mnt/c/PERCORSO/DEL/PROGETTO/setup_wsl.sh
+```
+
+> 📝 Sostituisci `/mnt/c/PERCORSO/DEL/PROGETTO/` con il percorso del tuo progetto convertito per Linux. La regola è semplice:
+> - `C:\Users\TuoNome\Desktop\rummo_cats_dogs` diventa `/mnt/c/Users/TuoNome/Desktop/rummo_cats_dogs`
+> - Sostituisci `\` con `/` e aggiungi `/mnt/` prima della lettera del disco (minuscola)
+>
+> **Esempio completo:**
+> ```powershell
+> wsl -d Ubuntu -- bash /mnt/c/Users/TuoNome/Desktop/rummo_cats_dogs/setup_wsl.sh
+> ```
+
+Questo script (ci vogliono **5-10 minuti**):
+1. Verifica che la GPU sia visibile
+2. Crea un ambiente virtuale Python dentro Linux
+3. Installa TensorFlow con supporto CUDA (GPU)
+4. Installa tutte le altre dipendenze
+5. Verifica che TensorFlow rilevi correttamente la GPU
+
+Alla fine vedrai un messaggio tipo:
+```
+TensorFlow: 2.21.0
+Built with CUDA: True
+GPU rilevate: 1
+  - /physical_device:GPU:0 (GPU)
+```
+
+Se vedi `GPU rilevate: 1` o più, tutto funziona! 🎉
+
+### Passo W6 — Usare la GPU per training e web app
+
+Ora puoi usare la GPU! Invece di `python train.py` e `python app.py`, userai degli script appositi:
+
+**Training con GPU:**
+```powershell
+wsl -d Ubuntu -- bash /mnt/c/PERCORSO/DEL/PROGETTO/train_gpu.sh
+```
+
+**Web App con GPU:**
+```powershell
+wsl -d Ubuntu -- bash /mnt/c/PERCORSO/DEL/PROGETTO/app_gpu.sh
+```
+
+> 💡 La web app con GPU è identica a quella su CPU, ma l'inferenza (classificazione delle immagini) è molto più veloce. Apri sempre il browser su **http://localhost:5000**.
+
+### 🔧 Riepilogo: come funziona il tutto
+
+```
+┌──────────────────────────────────────────────────┐
+│  WINDOWS                                         │
+│  ┌────────────────────┐  ┌─────────────────────┐ │
+│  │  PowerShell        │  │  Browser            │ │
+│  │  (lanci i comandi) │  │  http://localhost:   │ │
+│  │                    │  │  5000                │ │
+│  └────────┬───────────┘  └──────────┬──────────┘ │
+│           │ wsl -d Ubuntu           │ HTTP        │
+│  ─────────┼─────────────────────────┼──────────── │
+│  ┌────────┴─────────────────────────┴──────────┐ │
+│  │  WSL2 (Ubuntu Linux)                         │ │
+│  │  ┌─────────────┐  ┌──────────────────────┐  │ │
+│  │  │  Python +    │  │  NVIDIA CUDA         │  │ │
+│  │  │  TensorFlow  │──│  (accede alla GPU)   │  │ │
+│  │  └─────────────┘  └──────────┬───────────┘  │ │
+│  └──────────────────────────────┼───────────────┘ │
+│  ───────────────────────────────┼──────────────── │
+│  ┌──────────────────────────────┴───────────────┐ │
+│  │  NVIDIA GPU (RTX 4080, ecc.)                  │ │
+│  │  Calcoli paralleli → training/inferenza veloce│ │
+│  └───────────────────────────────────────────────┘ │
+└──────────────────────────────────────────────────┘
+```
+
+---
+
 ## 🏋️ Training del modello
 
-### Opzione A — Training su CPU (Windows nativo)
+### Opzione A — Training su CPU (Windows nativo, macOS, Linux)
 
 ```powershell
 python train.py
@@ -346,7 +507,9 @@ python train.py
 
 ### Opzione B — Training su GPU con WSL2 (consigliato, molto più veloce)
 
-TensorFlow ≥2.11 su Windows nativo non supporta CUDA. Per usare la GPU NVIDIA (es. RTX 4080), esegui il training tramite WSL2:
+> ℹ️ Richiede il setup WSL2 descritto nella sezione precedente "Usare la GPU con WSL2".
+
+TensorFlow ≥2.11 su Windows nativo non supporta CUDA. Per usare la GPU NVIDIA, esegui il training tramite WSL2:
 
 ```powershell
 # 1. Setup iniziale WSL2 (solo la prima volta)
