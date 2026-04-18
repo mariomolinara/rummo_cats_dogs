@@ -39,47 +39,300 @@ Le immagini contenute in queste cartelle verranno automaticamente suddivise dall
 
 ## 📋 Requisiti
 
-- **Python 3.10–3.13** (verificato con Python 3.13.7 + TensorFlow 2.21.0)
+- **Python 3.10, 3.11 o 3.12** (consigliato **3.11**). Python 3.13 funziona ma può dare problemi con alcune librerie.
+- **Git** (per scaricare il progetto da GitHub)
 - Il dataset **PetImages** con le sottocartelle `Cat/` e `Dog/` (vedi sezione precedente)
+- Connessione a Internet (per scaricare le dipendenze)
 
 ---
 
 ## 🚀 Installazione passo-passo
 
-### 1. Apri il terminale nella cartella del progetto
+> 🧑‍🎓 **Per chi non ha mai usato un terminale**: niente panico! Segui i passaggi uno per uno, copia e incolla i comandi, e tutto funzionerà. Se qualcosa va storto, leggi il messaggio di errore e controlla la sezione "Problemi comuni" in fondo.
 
-```powershell
-cd C:\Users\mmoli\Desktop\AIDALab\Rummo_11042026\rummo_cats_dogs
+---
+
+### Passo 0 — Installa Python e Git
+
+Prima di tutto servono due programmi: **Python** (il linguaggio di programmazione) e **Git** (per scaricare il progetto).
+
+<details>
+<summary><strong>🪟 Windows</strong></summary>
+
+1. **Installa Python 3.11**
+   - Vai su 👉 https://www.python.org/downloads/release/python-3119/
+   - Scorri in fondo alla pagina e clicca su **"Windows installer (64-bit)"**
+   - Apri il file scaricato
+   - ⚠️ **IMPORTANTISSIMO**: nella prima schermata, metti la spunta su **"Add Python 3.11 to PATH"** (in basso)
+   - Clicca "Install Now" e attendi la fine
+
+2. **Installa Git**
+   - Vai su 👉 https://git-scm.com/download/win
+   - Il download parte automaticamente. Apri il file e clicca "Next" su tutto, lasciando le opzioni predefinite.
+
+</details>
+
+<details>
+<summary><strong>🍎 macOS</strong></summary>
+
+1. **Installa Python 3.11**
+   - Vai su 👉 https://www.python.org/downloads/release/python-3119/
+   - Scarica il **"macOS 64-bit universal2 installer"**
+   - Apri il file `.pkg` e segui le istruzioni
+
+2. **Installa Git**
+   - Apri il Terminale (vedi sotto come fare) e scrivi:
+     ```bash
+     git --version
+     ```
+   - Se non è installato, macOS ti chiederà automaticamente di installare gli "Xcode Command Line Tools". Accetta e attendi.
+
+</details>
+
+<details>
+<summary><strong>🐧 Linux (Ubuntu/Debian)</strong></summary>
+
+Apri il terminale e digita:
+
+```bash
+sudo apt update
+sudo apt install python3.11 python3.11-venv python3-pip git -y
 ```
 
-### 2. Crea un ambiente virtuale (venv)
+> Se `python3.11` non è disponibile, aggiungi prima il repository:
+> ```bash
+> sudo add-apt-repository ppa:deadsnakes/ppa -y
+> sudo apt update
+> sudo apt install python3.11 python3.11-venv -y
+> ```
 
-Se il venv attuale usa Python 3.13 e TensorFlow non si installa, ricrea il venv con una versione compatibile:
+</details>
 
-```powershell
-# Rimuovi il venv esistente (se necessario)
-Remove-Item -Recurse -Force .venv
+---
 
-# Crea un nuovo venv con Python 3.11 (o 3.12)
-py -3.11 -m venv .venv
+### Passo 1 — Apri il terminale (prompt dei comandi)
+
+Il **terminale** è una finestra dove si scrivono comandi testuali al computer. Ogni sistema operativo ne ha uno.
+
+<details>
+<summary><strong>🪟 Windows — Come aprire PowerShell</strong></summary>
+
+Hai diverse opzioni:
+
+**Opzione A (la più semplice):**
+1. Premi i tasti **`Windows` + `R`** insieme (si apre una piccola finestra "Esegui")
+2. Scrivi `powershell` e premi **Invio**
+
+**Opzione B:**
+1. Clicca sul pulsante **Start** (icona Windows in basso a sinistra)
+2. Scrivi `PowerShell`
+3. Clicca su **"Windows PowerShell"** (NON scegliere "come amministratore" a meno che non serva)
+
+**Opzione C (da Esplora File):**
+1. Apri la cartella del progetto in Esplora File
+2. Clicca sulla barra dell'indirizzo in alto (dove c'è il percorso della cartella)
+3. Scrivi `powershell` e premi Invio → si apre un terminale già nella cartella giusta!
+
+Vedrai una finestra blu/nera con un testo tipo:
+```
+PS C:\Users\TuoNome>
+```
+Questo è il **prompt**: il computer aspetta i tuoi comandi. Il testo prima di `>` indica la cartella in cui ti trovi.
+
+</details>
+
+<details>
+<summary><strong>🍎 macOS — Come aprire il Terminale</strong></summary>
+
+1. Premi **`Cmd` + `Spazio`** (si apre Spotlight)
+2. Scrivi `Terminale` (o `Terminal`)
+3. Premi **Invio**
+
+Vedrai una finestra con un testo tipo:
+```
+tuonome@MacBook ~ %
 ```
 
-### 3. Attiva il venv
+</details>
 
+<details>
+<summary><strong>🐧 Linux — Come aprire il Terminale</strong></summary>
+
+- Premi **`Ctrl` + `Alt` + `T`** (funziona su Ubuntu e molte distribuzioni)
+- Oppure cerca "Terminale" nel menu delle applicazioni
+
+</details>
+
+---
+
+### Passo 2 — Scarica il progetto da GitHub
+
+Il progetto è ospitato su GitHub. Per scaricarlo, scrivi nel terminale:
+
+```bash
+git clone https://github.com/mariomolinara/rummo_cats_dogs.git
+```
+
+**Alternativa senza Git** (download manuale):
+1. Vai sulla pagina GitHub del progetto nel browser
+2. Clicca il pulsante verde **"Code"** → **"Download ZIP"**
+3. Estrai il file ZIP dove preferisci (es. sul Desktop)
+
+---
+
+### Passo 3 — Entra nella cartella del progetto
+
+Ora devi dire al terminale di "entrare" nella cartella del progetto. Il comando è `cd` (change directory).
+
+**Ma come trovo il percorso della cartella?**
+
+<details>
+<summary><strong>🪟 Windows — Come trovare il percorso di una cartella</strong></summary>
+
+1. Apri **Esplora File** e naviga fino alla cartella `rummo_cats_dogs`
+2. Clicca sulla **barra dell'indirizzo** in alto (dove vedi il percorso tipo `Questo PC > Desktop > ...`)
+3. Il percorso diventa selezionabile, ad esempio: `C:\Users\TuoNome\Desktop\rummo_cats_dogs`
+4. **Copialo** con `Ctrl+C`
+
+Poi nel terminale scrivi:
+
+```powershell
+cd "C:\Users\TuoNome\Desktop\rummo_cats_dogs"
+```
+
+> 💡 Puoi incollare nel terminale con il **tasto destro del mouse** oppure `Ctrl+V`.
+
+</details>
+
+<details>
+<summary><strong>🍎 macOS — Come trovare il percorso di una cartella</strong></summary>
+
+1. Apri il **Finder** e naviga fino alla cartella `rummo_cats_dogs`
+2. Fai **clic destro** sulla cartella → tieni premuto il tasto **`Option` (⌥)** → apparirà la voce **"Copia … come nome file"** (Copy as Pathname)
+3. Questo copia il percorso completo, ad esempio: `/Users/TuoNome/Desktop/rummo_cats_dogs`
+
+Poi nel terminale scrivi:
+
+```bash
+cd /Users/TuoNome/Desktop/rummo_cats_dogs
+```
+
+</details>
+
+<details>
+<summary><strong>🐧 Linux — Come trovare il percorso di una cartella</strong></summary>
+
+1. Apri il **File Manager** e naviga fino alla cartella
+2. Nella barra dell'indirizzo vedrai il percorso, ad esempio: `/home/tuonome/Desktop/rummo_cats_dogs`
+
+Poi nel terminale scrivi:
+
+```bash
+cd /home/tuonome/Desktop/rummo_cats_dogs
+```
+
+> 💡 Trucco: scrivi `cd ` (con lo spazio) e poi **trascina la cartella** dal file manager dentro il terminale. Il percorso si incolla automaticamente!
+
+</details>
+
+---
+
+### Passo 4 — Verifica che Python sia installato
+
+Controlliamo che Python funzioni:
+
+**🪟 Windows:**
+```powershell
+python --version
+```
+
+**🍎 macOS / 🐧 Linux:**
+```bash
+python3 --version
+```
+
+Dovresti vedere qualcosa come `Python 3.11.9`. Se vedi un errore, Python non è installato correttamente (torna al Passo 0).
+
+---
+
+### Passo 5 — Crea un ambiente virtuale (venv)
+
+Un **ambiente virtuale** è una "scatola isolata" dove installare le librerie del progetto senza interferire con il resto del computer. È una best practice in Python.
+
+**🪟 Windows:**
+```powershell
+python -m venv .venv
+```
+
+> Se hai più versioni di Python e vuoi usare la 3.11, scrivi:
+> ```powershell
+> py -3.11 -m venv .venv
+> ```
+
+**🍎 macOS / 🐧 Linux:**
+```bash
+python3.11 -m venv .venv
+```
+
+> Se `python3.11` non funziona, prova `python3 -m venv .venv`.
+
+Questo crea una cartella nascosta `.venv` dentro il progetto. Non toccarla manualmente.
+
+---
+
+### Passo 6 — Attiva l'ambiente virtuale
+
+Ogni volta che apri un nuovo terminale per lavorare sul progetto, devi "attivare" il venv.
+
+**🪟 Windows (PowerShell):**
 ```powershell
 .\.venv\Scripts\Activate.ps1
 ```
 
-> Se ricevi un errore sulla policy di esecuzione, esegui prima:
+> ⚠️ **Errore comune**: se appare un messaggio rosso tipo *"l'esecuzione di script è disabilitata"*, esegui prima questo comando (una volta sola):
 > ```powershell
 > Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
 > ```
+> Poi riprova il comando di attivazione.
 
-### 4. Installa le dipendenze
+**🪟 Windows (Prompt dei comandi classico, cmd):**
+```cmd
+.venv\Scripts\activate.bat
+```
 
-```powershell
+**🍎 macOS / 🐧 Linux:**
+```bash
+source .venv/bin/activate
+```
+
+**Come capisco che il venv è attivo?** Vedrai `(.venv)` all'inizio della riga del terminale:
+```
+(.venv) PS C:\Users\TuoNome\Desktop\rummo_cats_dogs>
+```
+
+---
+
+### Passo 7 — Installa le dipendenze
+
+Ora installiamo tutte le librerie necessarie (TensorFlow, Flask, Pillow, ecc.) con un solo comando:
+
+```bash
 pip install -r requirements.txt
 ```
+
+> ⏳ Questo comando scarica circa 1-2 GB di dati. Ci vogliono alcuni minuti a seconda della velocità della connessione.
+
+Se tutto va bene, vedrai varie righe di progresso e alla fine `Successfully installed ...`.
+
+> ⚠️ Se ricevi errori su TensorFlow e stai usando Python 3.13, ricrea il venv con Python 3.11 (torna al Passo 5).
+
+---
+
+### ✅ Installazione completata!
+
+Se sei arrivato qui senza errori, il progetto è pronto. Ora puoi:
+- **Addestrare la rete** → vai alla sezione "Training del modello"
+- **Usare la web app** → vai alla sezione "Avvio della Web App" (serve prima il training)
 
 ---
 
