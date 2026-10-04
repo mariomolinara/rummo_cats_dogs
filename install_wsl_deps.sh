@@ -22,6 +22,9 @@ pip install matplotlib flask Pillow scikit-learn
 echo ""
 
 echo "=== VERIFICA ==="
+# TF non trova da solo tutte le librerie CUDA installate via pip (es. libcusolver)
+SITE_PACKAGES="$(python -c 'import site; print(site.getsitepackages()[0])')"
+export LD_LIBRARY_PATH="$(echo "$SITE_PACKAGES"/nvidia/*/lib | tr ' ' ':'):${LD_LIBRARY_PATH:-}"
 python -c "
 import tensorflow as tf
 print(f'TF {tf.__version__}')

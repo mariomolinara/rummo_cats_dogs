@@ -22,5 +22,5 @@ for g in gpus:
 " 2>&1 | grep -v "^W\|^I0"
 else
     echo "Venv: NON TROVATO"
-    echo "Esegui: bash /mnt/c/Users/mmoli/Desktop/AIDALab/Rummo_11042026/rummo_cats_dogs/setup_wsl.sh"
+    echo "Esegui: bash /mnt/c/Users/mmoli/Desktop/Ricerca/AIDALab/Rummo_11042026/rummo_cats_dogs/setup_wsl.sh"
 fi

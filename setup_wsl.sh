@@ -1,13 +1,13 @@
 #!/bin/bash
 # setup_wsl.sh - Configura l'ambiente WSL2 con TensorFlow + CUDA per il training
 # Eseguire da PowerShell:
-#   wsl -d Ubuntu -- bash /mnt/c/Users/mmoli/Desktop/AIDALab/Rummo_11042026/rummo_cats_dogs/setup_wsl.sh
+#   wsl -d Ubuntu -- bash /mnt/c/Users/mmoli/Desktop/Ricerca/AIDALab/Rummo_11042026/rummo_cats_dogs/setup_wsl.sh
 
 set -e
 
 # Venv nel filesystem Linux nativo (molto piu veloce di /mnt/c)
 VENV_DIR="$HOME/.venvs/cats_dogs"
-PROJECT_DIR="/mnt/c/Users/mmoli/Desktop/AIDALab/Rummo_11042026/rummo_cats_dogs"
+PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 echo "=============================================="
 echo "  Setup WSL2 - TensorFlow con GPU CUDA"
@@ -63,6 +63,10 @@ echo ""
 echo "=============================================="
 echo "  Verifica TensorFlow + GPU"
 echo "=============================================="
+# TF non trova da solo tutte le librerie CUDA installate via pip (es. libcusolver):
+# vanno esposte in LD_LIBRARY_PATH, come fanno train_gpu.sh e app_gpu.sh
+SITE_PACKAGES="$(python -c 'import site; print(site.getsitepackages()[0])')"
+export LD_LIBRARY_PATH="$(echo "$SITE_PACKAGES"/nvidia/*/lib | tr ' ' ':'):${LD_LIBRARY_PATH:-}"
 python -c "
 import tensorflow as tf
 print(f'TensorFlow: {tf.__version__}')

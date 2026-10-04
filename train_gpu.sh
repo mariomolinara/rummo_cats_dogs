@@ -1,9 +1,9 @@
 #!/bin/bash
 # train_gpu.sh - Lancia train.py su WSL2 con supporto GPU CUDA
-# Da PowerShell: wsl -d Ubuntu -- bash /mnt/c/Users/mmoli/Desktop/AIDALab/Rummo_11042026/rummo_cats_dogs/train_gpu.sh
+# Da PowerShell: wsl -d Ubuntu -- bash /mnt/c/Users/mmoli/Desktop/Ricerca/AIDALab/Rummo_11042026/rummo_cats_dogs/train_gpu.sh
 
 VENV_DIR="$HOME/.venvs/cats_dogs"
-PROJECT_DIR="/mnt/c/Users/mmoli/Desktop/AIDALab/Rummo_11042026/rummo_cats_dogs"
+PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 if [ ! -d "$VENV_DIR" ]; then
     echo "Errore: venv WSL non trovato in $VENV_DIR"
